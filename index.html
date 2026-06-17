@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>Submit Workout</title>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #d9d9d9;
+    --bg: #ffffff;
+    --accent: #1f6feb;
+    --skip: #f3f3f3;
+    --tap: 56px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--fg);
+    font: 17px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap {
+    max-width: 640px; margin: 0 auto;
+    padding: 16px 16px calc(120px + env(safe-area-inset-bottom));
+  }
+  h1 { font-size: 20px; margin: 8px 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+
+  /* Day picker */
+  .days { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+  .day-btn {
+    display: block; width: 100%; min-height: var(--tap);
+    text-align: left; padding: 14px 16px;
+    border: 1px solid var(--line); border-radius: 12px;
+    background: #fff; color: var(--fg); font-size: 17px;
+  }
+  .day-btn .d-id { font-weight: 600; }
+  .day-btn .d-meta { color: var(--muted); font-size: 14px; display: block; margin-top: 2px; }
+  .day-btn.today { border-color: var(--accent); border-width: 2px; }
+  .badge {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    color: var(--accent); margin-left: 8px;
+  }
+
+  /* Exercise rows */
+  .row {
+    display: flex; align-items: center; gap: 12px;
+    min-height: var(--tap); padding: 10px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .row.skipped { background: var(--skip); }
+  .cb {
+    flex: 0 0 auto; width: 30px; height: 30px;
+    appearance: none; -webkit-appearance: none;
+    border: 2px solid var(--muted); border-radius: 7px;
+    background: #fff; position: relative;
+  }
+  .cb:checked { background: var(--accent); border-color: var(--accent); }
+  .cb:checked::after {
+    content: ""; position: absolute; left: 9px; top: 4px;
+    width: 7px; height: 14px; border: solid #fff;
+    border-width: 0 3px 3px 0; transform: rotate(45deg);
+  }
+  .ex { flex: 1 1 auto; min-width: 0; }
+  .ex .nm { font-weight: 500; }
+  .ex .meta { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .row.skipped .nm, .row.skipped .meta { text-decoration: line-through; opacity: 0.6; }
+  .wt {
+    flex: 0 0 auto; min-width: 78px; text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .wt input {
+    width: 84px; min-height: 44px; text-align: right;
+    font-size: 17px; padding: 4px 8px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: #fff; color: var(--fg);
+  }
+  .wt input.changed { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+  /* Note */
+  .note-wrap { margin: 18px 0 8px; }
+  .note-wrap label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+  textarea {
+    width: 100%; min-height: 72px; resize: vertical;
+    font: inherit; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--fg);
+  }
+
+  /* Sticky action bar */
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.96);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    display: flex; gap: 10px;
+    backdrop-filter: saturate(180%) blur(8px);
+  }
+  .btn {
+    flex: 1 1 auto; min-height: var(--tap);
+    border-radius: 12px; font-size: 17px; font-weight: 600;
+    border: 1px solid var(--line); background: #fff; color: var(--fg);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; flex: 2 1 auto; }
+  .btn:active { opacity: 0.8; }
+
+  .back { display: inline-block; margin-bottom: 12px; color: var(--accent); font-size: 15px; background: none; border: none; padding: 6px 0; }
+  .hidden { display: none !important; }
+  .err { color: #b00020; font-size: 14px; margin: 12px 0; }
+  .toast {
+    position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%);
+    background: #1a1a1a; color: #fff; padding: 10px 16px; border-radius: 10px;
+    font-size: 15px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 10;
+    max-width: 90%; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- DAY PICKER VIEW -->
+  <section id="picker">
+    <h1>Submit Workout</h1>
+    <p class="sub" id="picker-sub">Pick a workout.</p>
+    <div class="days" id="days"></div>
+    <p class="err hidden" id="picker-err"></p>
+  </section>
+
+  <!-- WORKOUT VIEW -->
+  <section id="workout" class="hidden">
+    <button class="back" id="back">&larr; Change day</button>
+    <h1 id="w-title">Workout</h1>
+    <p class="sub" id="w-sub"></p>
+    <div id="rows"></div>
+    <div class="note-wrap">
+      <label for="note">Session note (optional)</label>
+      <textarea id="note" placeholder="e.g. left knee tight, dropped to 3x6"></textarea>
+    </div>
+  </section>
+</div>
+
+<!-- STICKY BAR (only in workout view) -->
+<div class="bar hidden" id="bar">
+  <button class="btn" id="copy">Copy payload</button>
+  <button class="btn primary" id="submit">Submit</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---- CONFIG -----------------------------------------------------------------
+// The tiny Apple Shortcut that receives the payload and saves it to Dropbox.
+// Must match the shortcut name EXACTLY (see SaveWorkout-shortcut-recipe.md).
+const SHORTCUT_NAME = "SaveWorkout";
+// Transport shape to the shortcut (keep in sync with SaveWorkout-shortcut-recipe.md):
+//   LINE 1            = the target filename
+//   LINE 2 .. end     = the payload body, verbatim
+// The shortcut splits on New Lines, takes line 1 as the filename, and re-joins
+// lines 2..end (with New Lines) as the file body. No sentinel, no newline artifacts.
+// -----------------------------------------------------------------------------
+
+let DATA = null;
+let current = null; // the selected workout object
+
+const $ = (id) => document.getElementById(id);
+
+function todayLocalISODate() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+// local ISO datetime: yyyy-MM-ddTHH:mm:ss  (NO timezone suffix, NO UTC shift)
+function completedAtLocal() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}` +
+         `T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+
+// filename stamp: yyyy-MM-dd-HHmm  (local)
+function stampLocal() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+async function load() {
+  try {
+    const res = await fetch("workouts.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    DATA = await res.json();
+  } catch (e) {
+    $("picker-err").textContent = "Could not load workouts.json — " + e.message;
+    $("picker-err").classList.remove("hidden");
+    return;
+  }
+  renderPicker();
+}
+
+function renderPicker() {
+  const days = $("days");
+  days.innerHTML = "";
+  const list = (DATA.workouts || []);
+  if (list.length === 0) {
+    $("picker-sub").textContent = "No workouts queued.";
+    return;
+  }
+  const today = todayLocalISODate();
+  $("picker-sub").textContent = list.length === 1 ? "1 workout queued." : list.length + " workouts queued.";
+  list.forEach((w, i) => {
+    const b = document.createElement("button");
+    b.className = "day-btn" + (w.workout_date === today ? " today" : "");
+    const isToday = w.workout_date === today;
+    b.innerHTML =
+      `<span class="d-id">${escapeHtml(w.workout_id)}${isToday ? '<span class="badge">TODAY</span>' : ''}</span>` +
+      `<span class="d-meta">${w.lines.length} exercises &middot; ${escapeHtml(w.workout_date)}</span>`;
+    b.addEventListener("click", () => openWorkout(i));
+    days.appendChild(b);
+  });
+  // If exactly one matches today, open it straight away.
+  const todays = list.filter((w) => w.workout_date === today);
+  if (todays.length === 1) openWorkout(list.indexOf(todays[0]));
+}
+
+function openWorkout(idx) {
+  current = DATA.workouts[idx];
+  $("picker").classList.add("hidden");
+  $("workout").classList.remove("hidden");
+  $("bar").classList.remove("hidden");
+  $("w-title").textContent = current.workout_id;
+  $("w-sub").textContent = current.lines.length + " exercises · all checked — uncheck what you skip";
+  $("note").value = "";
+
+  const rows = $("rows");
+  rows.innerHTML = "";
+  current.lines.forEach((ln, i) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.dataset.i = i;
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.className = "cb";
+    cb.checked = true;
+    cb.addEventListener("change", () => {
+      row.classList.toggle("skipped", !cb.checked);
+    });
+
+    const ex = document.createElement("div");
+    ex.className = "ex";
+    ex.innerHTML = `<div class="nm">${escapeHtml(ln.name)}</div>` +
+                   `<div class="meta">${escapeHtml(ln.setsreps)}</div>`;
+
+    const wt = document.createElement("div");
+    wt.className = "wt";
+    const inp = document.createElement("input");
+    inp.type = "text";
+    inp.value = ln.weight;
+    inp.setAttribute("inputmode", "text");
+    inp.setAttribute("autocapitalize", "off");
+    inp.setAttribute("autocomplete", "off");
+    inp.dataset.orig = ln.weight;
+    inp.addEventListener("input", () => {
+      inp.classList.toggle("changed", inp.value.trim() !== inp.dataset.orig);
+    });
+    wt.appendChild(inp);
+
+    // tapping anywhere on the label area toggles the checkbox (big target),
+    // but NOT when tapping the weight field.
+    ex.addEventListener("click", () => { cb.checked = !cb.checked; cb.dispatchEvent(new Event("change")); });
+
+    row.appendChild(cb);
+    row.appendChild(ex);
+    row.appendChild(wt);
+    rows.appendChild(row);
+  });
+}
+
+function backToPicker() {
+  $("workout").classList.add("hidden");
+  $("bar").classList.add("hidden");
+  $("picker").classList.remove("hidden");
+  current = null;
+}
+
+// Assemble the payload EXACTLY per result-payload-template.md
+function buildPayload() {
+  const lines = [];
+  const rows = $("rows").querySelectorAll(".row");
+  rows.forEach((row) => {
+    const i = parseInt(row.dataset.i, 10);
+    const ln = current.lines[i];
+    const done = row.querySelector(".cb").checked;
+    const inp = row.querySelector(".wt input");
+    const performed = inp.value.trim();
+    // Rebuild the line body. If the weight was edited, swap the 3rd pipe field;
+    // otherwise emit the raw line verbatim.
+    let body;
+    if (performed !== "" && performed !== ln.weight) {
+      body = `${ln.name} | ${ln.setsreps} | ${performed}`;
+    } else {
+      body = ln.raw;
+    }
+    lines.push(`- [${done ? "x" : " "}] ${body}`);
+  });
+
+  const fm =
+    "---\n" +
+    `workout_id: ${current.workout_id}\n` +
+    `completed_at: ${completedAtLocal()}\n` +
+    "---\n";
+
+  let body = fm + lines.join("\n");
+
+  const note = $("note").value.trim();
+  if (note !== "") {
+    body += `\n\nnote: ${note}`;
+  }
+  body += "\n"; // trailing newline, matches a normal text file
+  return body;
+}
+
+function filename() {
+  return `${stampLocal()}-workout-result-${current.slug}.md`;
+}
+
+function submit() {
+  const payload = buildPayload();
+  const fname = filename();
+  // Line 1 = filename, lines 2..end = payload body. The shortcut splits on New Lines.
+  const input = fname + "\n" + payload;
+  const url = "shortcuts://x-callback-url/run-shortcut" +
+              "?name=" + encodeURIComponent(SHORTCUT_NAME) +
+              "&input=text" +
+              "&text=" + encodeURIComponent(input);
+  // Navigate to fire the shortcut.
+  window.location.href = url;
+}
+
+async function copyPayload() {
+  const payload = buildPayload();
+  try {
+    await navigator.clipboard.writeText(payload);
+    toast("Payload copied. Paste into Drafts → Team Inbox if offline.");
+  } catch (e) {
+    // Fallback: select into a temp textarea.
+    const ta = document.createElement("textarea");
+    ta.value = payload;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); toast("Payload copied."); }
+    catch (_) { toast("Copy failed — long-press to select manually."); }
+    document.body.removeChild(ta);
+  }
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+$("back").addEventListener("click", backToPicker);
+$("submit").addEventListener("click", submit);
+$("copy").addEventListener("click", copyPayload);
+
+load();
+</script>
+</body>
+</html>

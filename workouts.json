@@ -1,0 +1,125 @@
+{
+  "generated_at": "2026-06-17T19:19:36.181Z",
+  "workouts": [
+    {
+      "workout_id": "2026-06-17-day-a",
+      "workout_date": "2026-06-17",
+      "slug": "day-a",
+      "source_file": "2026-06-17-workout-day-a.md",
+      "lines": [
+        {
+          "raw": "Bench press | 3x5-8 | 165#",
+          "name": "Bench press",
+          "setsreps": "3x5-8",
+          "weight": "165#"
+        },
+        {
+          "raw": "Seated cable row | 3x10-12 | 110#",
+          "name": "Seated cable row",
+          "setsreps": "3x10-12",
+          "weight": "110#"
+        },
+        {
+          "raw": "Goblet squat | 3x10-12 | 45#",
+          "name": "Goblet squat",
+          "setsreps": "3x10-12",
+          "weight": "45#"
+        },
+        {
+          "raw": "Neutral-grip DB shoulder press | 3x10-12 | 15#",
+          "name": "Neutral-grip DB shoulder press",
+          "setsreps": "3x10-12",
+          "weight": "15#"
+        },
+        {
+          "raw": "Plank | 3x30s | bodyweight",
+          "name": "Plank",
+          "setsreps": "3x30s",
+          "weight": "bodyweight"
+        }
+      ]
+    },
+    {
+      "workout_id": "2026-06-18-day-b",
+      "workout_date": "2026-06-18",
+      "slug": "day-b",
+      "source_file": "2026-06-18-workout-day-b.md",
+      "lines": [
+        {
+          "raw": "DB Romanian deadlift | 3x8-10 | 40#",
+          "name": "DB Romanian deadlift",
+          "setsreps": "3x8-10",
+          "weight": "40#"
+        },
+        {
+          "raw": "Lat pulldown | 3x8-10 | 110#",
+          "name": "Lat pulldown",
+          "setsreps": "3x8-10",
+          "weight": "110#"
+        },
+        {
+          "raw": "Incline DB press | 3x8-10 | 35#",
+          "name": "Incline DB press",
+          "setsreps": "3x8-10",
+          "weight": "35#"
+        },
+        {
+          "raw": "Cable face pull | 3x12-15 | 30#",
+          "name": "Cable face pull",
+          "setsreps": "3x12-15",
+          "weight": "30#"
+        },
+        {
+          "raw": "Farmer carry | 3x45s | 40#",
+          "name": "Farmer carry",
+          "setsreps": "3x45s",
+          "weight": "40#"
+        }
+      ]
+    },
+    {
+      "workout_id": "2026-06-19-day-c",
+      "workout_date": "2026-06-19",
+      "slug": "day-c",
+      "source_file": "2026-06-19-workout-day-c.md",
+      "lines": [
+        {
+          "raw": "Flat DB bench press | 3x8-12 | 40#",
+          "name": "Flat DB bench press",
+          "setsreps": "3x8-12",
+          "weight": "40#"
+        },
+        {
+          "raw": "One-arm DB row | 3x10-12 | 40#",
+          "name": "One-arm DB row",
+          "setsreps": "3x10-12",
+          "weight": "40#"
+        },
+        {
+          "raw": "DB lateral raise | 3x12-15 | 10#",
+          "name": "DB lateral raise",
+          "setsreps": "3x12-15",
+          "weight": "10#"
+        },
+        {
+          "raw": "DB curl | 3x10-12 | 25#",
+          "name": "DB curl",
+          "setsreps": "3x10-12",
+          "weight": "25#"
+        },
+        {
+          "raw": "Rope triceps pushdown | 3x10-12 | 30#",
+          "name": "Rope triceps pushdown",
+          "setsreps": "3x10-12",
+          "weight": "30#"
+        },
+        {
+          "raw": "Push-up AMRAP | 2x15-25 | bodyweight",
+          "name": "Push-up AMRAP",
+          "setsreps": "2x15-25",
+          "weight": "bodyweight"
+        }
+      ]
+    }
+  ]
+}
