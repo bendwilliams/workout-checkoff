@@ -116,6 +116,56 @@
     max-width: 90%; text-align: center;
   }
   .toast.show { opacity: 1; }
+
+  /* How-to guide link */
+  .howto {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 6px; padding: 4px 0;
+    color: var(--accent); font-size: 14px; font-weight: 500;
+    background: none; border: none; cursor: pointer;
+  }
+  .howto .play {
+    flex: 0 0 auto; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  /* Bottom-sheet popup */
+  .sheet-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 20;
+  }
+  .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
+    background: #fff; border-radius: 18px 18px 0 0;
+    max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    transform: translateY(100%); transition: transform .25s ease;
+    padding: 0 16px calc(24px + env(safe-area-inset-bottom));
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet-head {
+    position: sticky; top: 0; background: #fff; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 0 10px; border-bottom: 1px solid var(--line);
+  }
+  .sheet-head h2 { font-size: 18px; margin: 0; }
+  .sheet-close {
+    flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: var(--skip); color: var(--fg); font-size: 22px; line-height: 1;
+  }
+  .video-box {
+    position: relative; width: 100%; padding-top: 56.25%;
+    margin: 16px 0 4px; border-radius: 12px; overflow: hidden; background: #000;
+  }
+  .video-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .sec-title { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 22px 0 8px; }
+  .bodymap { display: block; width: 100%; max-height: 320px; margin: 0 auto; }
+  .legend { display: flex; gap: 18px; justify-content: center; font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .cues { margin: 0; padding-left: 22px; }
+  .cues li { margin: 9px 0; }
+  .src { font-size: 12px; color: var(--muted); margin-top: 18px; }
 </style>
 </head>
 <body>
@@ -150,6 +200,17 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- EXERCISE GUIDE POPUP -->
+<div class="sheet-backdrop" id="sheet-backdrop"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+  <div class="sheet-head">
+    <h2 id="sheet-title">Exercise</h2>
+    <button class="sheet-close" id="sheet-close" aria-label="Close">&times;</button>
+  </div>
+  <div id="sheet-body"></div>
+</div>
+
+<script src="bodymap.js"></script>
 <script>
 // ---- CONFIG -----------------------------------------------------------------
 // The tiny Apple Shortcut that receives the payload and saves it to Dropbox.
@@ -164,8 +225,12 @@ const SHORTCUT_NAME = "SaveWorkout";
 
 let DATA = null;
 let current = null; // the selected workout object
+let GUIDES = {};    // normalized-name -> guide card (from exercise-guides.json)
 
 const $ = (id) => document.getElementById(id);
+
+// Look up an exercise guide by its name (case/space-insensitive).
+const normName = (s) => String(s).toLowerCase().trim();
 
 function todayLocalISODate() {
   const d = new Date();
@@ -198,6 +263,16 @@ async function load() {
     $("picker-err").classList.remove("hidden");
     return;
   }
+  // Exercise guides are optional: if this fails, the page works exactly as before,
+  // just without the "how-to" links.
+  try {
+    const gres = await fetch("exercise-guides.json", { cache: "no-store" });
+    if (gres.ok) {
+      const raw = (await gres.json()).guides || {};
+      GUIDES = {};
+      for (const k in raw) GUIDES[normName(k)] = raw[k];
+    }
+  } catch (e) { /* guides unavailable — non-fatal */ }
   renderPicker();
 }
 
@@ -254,6 +329,18 @@ function openWorkout(idx) {
     ex.className = "ex";
     ex.innerHTML = `<div class="nm">${escapeHtml(ln.name)}</div>` +
                    `<div class="meta">${escapeHtml(ln.setsreps)}</div>`;
+
+    // If this exercise has a guide card, add a tappable "how-to" link under it.
+    const guide = GUIDES[normName(ln.name)];
+    if (guide) {
+      const link = document.createElement("button");
+      link.className = "howto";
+      link.type = "button";
+      link.innerHTML = `<span class="play">&#9654;</span> Muscles &amp; how-to`;
+      // Don't let tapping the link toggle the row's checkbox.
+      link.addEventListener("click", (e) => { e.stopPropagation(); openGuide(guide); });
+      ex.appendChild(link);
+    }
 
     const wt = document.createElement("div");
     wt.className = "wt";
@@ -371,6 +458,62 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
+
+// ---- EXERCISE GUIDE POPUP ---------------------------------------------------
+
+// Build the front+back muscle map SVG, highlighting primary/secondary muscles.
+function muscleSVG(primary, secondary) {
+  const BM = window.BODY_MAP;
+  if (!BM) return "";
+  const prim = new Set(primary || []);
+  const sec = new Set(secondary || []);
+  let fills = "";
+  for (const slug in BM.muscles) {
+    let fill = "#e9e9ec";                 // resting muscle
+    if (prim.has(slug)) fill = "#1f6feb"; // primary (accent)
+    else if (sec.has(slug)) fill = "#9ec1f5"; // secondary (light accent)
+    for (const d of BM.muscles[slug]) fills += `<path d="${d}" fill="${fill}"/>`;
+  }
+  const outline =
+    `<path d="${BM.outlineFront}" fill="none" stroke="#c4c4c8" stroke-width="2" vector-effect="non-scaling-stroke"/>` +
+    `<path d="${BM.outlineBack}" fill="none" stroke="#c4c4c8" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+  return `<svg class="bodymap" viewBox="${BM.viewBox}" xmlns="http://www.w3.org/2000/svg" ` +
+         `role="img" aria-label="Muscles worked (front and back view)">${fills}${outline}</svg>`;
+}
+
+function openGuide(g) {
+  $("sheet-title").textContent = g.name;
+  const cues = (g.cues || []).map((c) => `<li>${escapeHtml(c)}</li>`).join("");
+  const vid = g.video && g.video.youtube
+    ? `<div class="video-box"><iframe
+         src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(g.video.youtube)}?rel=0&modestbranding=1&playsinline=1"
+         title="${escapeHtml(g.name)} form video"
+         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+         allowfullscreen></iframe></div>`
+    : "";
+  $("sheet-body").innerHTML =
+    vid +
+    `<div class="sec-title">Muscles worked</div>` +
+    muscleSVG(g.primary, g.secondary) +
+    `<div class="legend"><span><i style="background:#1f6feb"></i>Primary</span>` +
+    `<span><i style="background:#9ec1f5"></i>Supporting</span></div>` +
+    `<div class="sec-title">How to do it</div>` +
+    `<ol class="cues">${cues}</ol>` +
+    (g.source ? `<p class="src">Form video: ${escapeHtml(g.source)}. Muscle map adapted from react-native-body-highlighter (MIT).</p>` : "");
+  $("sheet").scrollTop = 0;
+  $("sheet-backdrop").classList.add("open");
+  $("sheet").classList.add("open");
+}
+
+function closeSheet() {
+  $("sheet").classList.remove("open");
+  $("sheet-backdrop").classList.remove("open");
+  // Clear the iframe so the video stops playing when closed.
+  $("sheet-body").innerHTML = "";
+}
+
+$("sheet-close").addEventListener("click", closeSheet);
+$("sheet-backdrop").addEventListener("click", closeSheet);
 
 $("back").addEventListener("click", backToPicker);
 $("submit").addEventListener("click", submit);

@@ -1,0 +1,18 @@
+{
+  "_comment": "Exercise guide library ('card catalog'). One card per exercise, keyed by the exercise name lowercased + trimmed. Any exercise in workouts.json with a matching card gets a tappable 'how-to' link. Muscle slugs must come from the body map (bodymap.js): chest, abs, obliques, biceps, triceps, forearm, deltoids, trapezius, lats=upper-back, quadriceps, hamstring, gluteal, calves, adductors, lower-back, neck. video.youtube is a verified-embeddable YouTube video id.",
+  "guides": {
+    "db romanian deadlift": {
+      "name": "DB Romanian deadlift",
+      "primary": ["hamstring", "gluteal", "lower-back"],
+      "secondary": ["upper-back", "trapezius", "forearm"],
+      "video": { "youtube": "V8Hdl1FiNt4" },
+      "source": "NASM",
+      "cues": [
+        "Hold a dumbbell in each hand, feet under your hips, knees soft — not locked, not squatting.",
+        "Push your hips straight back like you're closing a car door with your butt; let the dumbbells slide down the front of your legs.",
+        "Keep your back flat and chest proud the whole time — never let your lower back round.",
+        "Go down until you feel a stretch in the back of your thighs, then squeeze your glutes to stand back up."
+      ]
+    }
+  }
+}
