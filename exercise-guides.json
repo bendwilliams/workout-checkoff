@@ -1,5 +1,5 @@
 {
-  "_comment": "Exercise guide library ('card catalog'). One card per exercise, keyed by the exercise name lowercased + trimmed. Any exercise in workouts.json with a matching card gets a tappable 'how-to' link. Muscle slugs must come from the body map (bodymap.js): chest, abs, obliques, biceps, triceps, forearm, deltoids, trapezius, lats=upper-back, quadriceps, hamstring, gluteal, calves, adductors, lower-back, neck. video.youtube is a verified-embeddable YouTube video id.",
+  "_comment": "Exercise guide library ('card catalog'). One card per exercise, keyed by the exercise name lowercased + trimmed. Any exercise in workouts.json with a matching card gets a tappable 'how-to' link. Muscle slugs must come from the body map (bodymap.js): chest, abs, obliques, biceps, triceps, forearm, deltoids, trapezius, upper-back (=lats), lower-back, quadriceps, hamstring, gluteal, calves, adductors, neck. video.youtube is a verified-embeddable YouTube video id (check with the YouTube oEmbed endpoint before adding). Cues by Sterling; videos verified by Larry.",
   "guides": {
     "db romanian deadlift": {
       "name": "DB Romanian deadlift",
@@ -12,6 +12,201 @@
         "Push your hips straight back like you're closing a car door with your butt; let the dumbbells slide down the front of your legs.",
         "Keep your back flat and chest proud the whole time — never let your lower back round.",
         "Go down until you feel a stretch in the back of your thighs, then squeeze your glutes to stand back up."
+      ]
+    },
+    "bench press": {
+      "name": "Bench press",
+      "primary": ["chest", "triceps", "deltoids"],
+      "secondary": ["forearm"],
+      "video": { "youtube": "rT7DgCr-3pg" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Lie back on the bench with your eyes under the bar; plant your feet flat and squeeze your shoulder blades together like you're pinching a pencil between them.",
+        "Grip a little wider than your shoulders; lower the bar slowly to the middle of your chest, elbows tucked at about 45 degrees — not flared straight out.",
+        "Touch your chest lightly, then push the bar back up and slightly toward your face, like pushing a heavy door off you.",
+        "Keep your butt on the bench the whole time — no bouncing the bar."
+      ]
+    },
+    "seated cable row": {
+      "name": "Seated cable row",
+      "primary": ["upper-back", "trapezius"],
+      "secondary": ["biceps", "deltoids", "forearm"],
+      "video": { "youtube": "GZbfZ033f74" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Sit tall with a slight bend in your knees; grab the handle and let your arms reach forward without slumping your shoulders.",
+        "Pull the handle to your belly button by driving your elbows straight back, like elbowing someone behind you.",
+        "Squeeze your shoulder blades together at the end as if cracking a walnut between them, then let the weight stretch you forward slowly.",
+        "Keep your torso still — don't rock back and forth to heave the weight."
+      ]
+    },
+    "goblet squat": {
+      "name": "Goblet squat",
+      "primary": ["quadriceps", "gluteal"],
+      "secondary": ["hamstring", "abs", "adductors", "lower-back"],
+      "video": { "youtube": "MeIiIdhvXT4" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Hold one dumbbell vertically against your chest like a goblet, cupping the top end with both hands; feet a bit wider than your shoulders, toes turned out slightly.",
+        "Sit straight down between your legs like lowering onto a low chair behind you — keep your chest up and the weight glued to your chest.",
+        "Go down until your elbows brush the inside of your knees, keeping your heels planted flat on the floor.",
+        "Push the floor away to stand, squeezing your butt at the top; let your knees track out over your toes, never caving inward."
+      ]
+    },
+    "neutral-grip db shoulder press": {
+      "name": "Neutral-grip DB shoulder press",
+      "primary": ["deltoids", "triceps"],
+      "secondary": ["trapezius", "upper-back"],
+      "video": { "youtube": "qEwKCR5JCog" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Sit tall holding a dumbbell in each hand with your palms facing each other (knuckles forward), elbows bent so the weights sit by your ears.",
+        "Press the dumbbells straight up overhead, keeping your palms facing each other the whole way — like raising the roof.",
+        "Stop just short of locking your elbows, then lower slowly back to ear height under control.",
+        "Keep your ribs down and don't arch your lower back to cheat the weight up."
+      ]
+    },
+    "plank": {
+      "name": "Plank",
+      "primary": ["abs"],
+      "secondary": ["obliques", "lower-back", "deltoids", "gluteal"],
+      "video": { "youtube": "pSHjTRCQxIw" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Set your forearms on the floor under your shoulders, elbows directly below them; legs straight back, balancing on your toes.",
+        "Make your body one straight line from head to heels — no sagging hips, no butt poking up in the air.",
+        "Brace your stomach like someone's about to poke you in the gut, and squeeze your butt to lock the line.",
+        "Keep your neck long, eyes on the floor just ahead of your hands — don't crane your head up."
+      ]
+    },
+    "lat pulldown": {
+      "name": "Lat pulldown",
+      "primary": ["upper-back"],
+      "secondary": ["biceps", "deltoids", "forearm"],
+      "video": { "youtube": "CAwf7n6Luuc" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Sit tall and pin your thighs under the pad so you don't get yanked up out of the seat.",
+        "Grab the bar a bit wider than your shoulders, hands like hooks — don't death-grip it.",
+        "Lead with your elbows: drive them down toward your back pockets, pulling the bar to the top of your chest.",
+        "Lean back just slightly and squeeze your shoulder blades down — never yank the bar behind your neck."
+      ]
+    },
+    "incline db press": {
+      "name": "Incline DB press",
+      "primary": ["chest", "deltoids"],
+      "secondary": ["triceps"],
+      "video": { "youtube": "8iPEnn-ltC8" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Set the bench to a gentle slope — about the angle of a zero-gravity lounge chair, not sitting straight up.",
+        "Start with the dumbbells at the top of your chest, palms facing your feet, feet planted on the floor.",
+        "Press up and slightly together until your arms are straight, then lower until you feel a light stretch across your upper chest.",
+        "Keep your shoulder blades pinned back and down into the bench the whole time — don't let your shoulders shrug up to your ears."
+      ]
+    },
+    "cable face pull": {
+      "name": "Cable face pull",
+      "primary": ["deltoids"],
+      "secondary": ["trapezius", "upper-back"],
+      "video": { "youtube": "rep-qVOkqgk" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Set the rope at about head height and step back so there's tension before you start.",
+        "Grab the rope ends with thumbs pointing back at you, arms straight out in front.",
+        "Pull the rope toward your eyes, splitting your hands apart so they finish beside your ears — like doing a double bicep flex.",
+        "Lead with your elbows high and squeeze your shoulder blades together at the end; keep it slow, no swinging."
+      ]
+    },
+    "farmer carry": {
+      "name": "Farmer carry",
+      "primary": ["forearm", "trapezius"],
+      "secondary": ["abs", "obliques", "gluteal", "quadriceps", "upper-back"],
+      "video": { "youtube": "Fkzk_RqlYig" },
+      "source": "Buff Dudes",
+      "cues": [
+        "Stand tall between two heavy dumbbells, hinge down, and grab one in each hand with a firm grip.",
+        "Stand up by driving through your legs, chest proud, shoulders pulled back — not hunched over the weights.",
+        "Walk slow and steady with short controlled steps, like you're balancing a book on your head.",
+        "Brace your stomach hard so the weights don't make you tip side to side — don't let them swing."
+      ]
+    },
+    "flat db bench press": {
+      "name": "Flat DB bench press",
+      "primary": ["chest", "deltoids"],
+      "secondary": ["triceps"],
+      "video": { "youtube": "VmB1G1K7v94" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Lie back on the bench, feet flat on the floor, a dumbbell in each hand resting on your chest.",
+        "Press both dumbbells straight up over your chest until your arms are nearly straight — don't slam your elbows locked.",
+        "Keep your elbows about halfway out, not flared straight out to the sides — imagine making an arrow shape, not a T.",
+        "Lower slowly until the dumbbells are level with your chest, feel a gentle stretch, then press back up."
+      ]
+    },
+    "one-arm db row": {
+      "name": "One-arm DB row",
+      "primary": ["upper-back"],
+      "secondary": ["biceps", "trapezius", "deltoids", "forearm"],
+      "video": { "youtube": "pYcpY20QaE8" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Put one knee and the same-side hand on the bench so your back is flat like a tabletop; the other foot stays on the floor.",
+        "Let the dumbbell hang straight down toward the floor at arm's length.",
+        "Pull it up toward your hip — not your chest — driving your elbow toward the ceiling like you're starting a lawnmower.",
+        "Squeeze your shoulder blade in at the top, then lower it all the way down under control. Don't twist your torso to cheat it up."
+      ]
+    },
+    "db lateral raise": {
+      "name": "DB lateral raise",
+      "primary": ["deltoids"],
+      "secondary": ["trapezius"],
+      "video": { "youtube": "3VcKaXpzqRo" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Stand tall, a dumbbell in each hand at your sides, a slight bend in your elbows like you're holding two water jugs.",
+        "Raise both arms out to the sides until they're level with your shoulders — make a T shape, no higher.",
+        "Lead with your elbows, not your hands; imagine pouring out a jug at the top so your pinky tips slightly up.",
+        "Lower slowly and with control — don't let gravity drop them. Keep it smooth, no swinging or shrugging up by your ears."
+      ]
+    },
+    "db curl": {
+      "name": "DB curl",
+      "primary": ["biceps"],
+      "secondary": ["forearm"],
+      "video": { "youtube": "ykJmrZ5v0Oo" },
+      "source": "Howcast",
+      "cues": [
+        "Stand tall, a dumbbell in each hand hanging at your sides, palms facing forward.",
+        "Curl the weights up toward your shoulders by bending only at the elbow — keep your upper arms pinned to your sides.",
+        "Keep your elbows still and your wrists straight; don't swing your body or rock back to heave the weight up.",
+        "Squeeze at the top, then lower all the way down slowly until your arms are straight again."
+      ]
+    },
+    "rope triceps pushdown": {
+      "name": "Rope triceps pushdown",
+      "primary": ["triceps"],
+      "secondary": [],
+      "video": { "youtube": "2-LAMcpzODU" },
+      "source": "ScottHermanFitness",
+      "cues": [
+        "Stand facing the cable machine with the rope attached up high; grab one end of the rope in each hand.",
+        "Tuck your elbows tight against your sides and keep them there — they're the hinge and they don't move.",
+        "Push the rope straight down until your arms are fully straight, spreading the rope ends apart at the bottom.",
+        "Let it rise back up slowly only until your forearms are about level — don't let your elbows drift forward or flare out."
+      ]
+    },
+    "push-up amrap": {
+      "name": "Push-up AMRAP",
+      "primary": ["chest", "deltoids", "triceps"],
+      "secondary": ["abs"],
+      "video": { "youtube": "IODxDxX7oi4" },
+      "source": "Calisthenicmovement",
+      "cues": [
+        "Hands on the floor a little wider than your shoulders, body in one straight line from head to heels — like a moving plank.",
+        "Squeeze your belly and glutes so your hips don't sag or pike up; your whole body moves as one stiff board.",
+        "Lower yourself until your chest is just above the floor, keeping your elbows angled back at roughly 45 degrees, not flared straight out.",
+        "Push the floor away to come back up. AMRAP means do as many good reps as you can — stop the set when your form starts breaking, not before and not after."
       ]
     }
   }

@@ -117,6 +117,16 @@
   }
   .toast.show { opacity: 1; }
 
+  /* Floating refresh button (always available, even as a home-screen app) */
+  .refresh {
+    position: fixed; top: calc(env(safe-area-inset-top) + 8px); right: 12px; z-index: 15;
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid var(--line); background: rgba(255,255,255,0.96); color: var(--accent);
+    font-size: 22px; line-height: 1; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.12); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  }
+  .refresh:active { opacity: 0.6; }
+
   /* How-to guide link */
   .howto {
     display: inline-flex; align-items: center; gap: 6px;
@@ -169,6 +179,7 @@
 </style>
 </head>
 <body>
+<button class="refresh" id="refresh" aria-label="Refresh page" title="Refresh">&#8635;</button>
 <div class="wrap">
 
   <!-- DAY PICKER VIEW -->
@@ -514,6 +525,13 @@ function closeSheet() {
 
 $("sheet-close").addEventListener("click", closeSheet);
 $("sheet-backdrop").addEventListener("click", closeSheet);
+
+// Refresh button: force a fresh load that bypasses any cached copy of the page,
+// so updates always show even when launched as a home-screen app.
+$("refresh").addEventListener("click", () => {
+  const base = location.href.split("?")[0];
+  location.replace(base + "?r=" + Date.now());
+});
 
 $("back").addEventListener("click", backToPicker);
 $("submit").addEventListener("click", submit);
