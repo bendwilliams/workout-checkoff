@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-06-17T19:19:36.181Z",
+  "generated_at": "2026-06-22T18:27:59.632Z",
   "workouts": [
     {
-      "workout_id": "2026-06-17-day-a",
-      "workout_date": "2026-06-17",
+      "workout_id": "2026-06-22-day-a",
+      "workout_date": "2026-06-22",
       "slug": "day-a",
-      "source_file": "2026-06-17-workout-day-a.md",
+      "source_file": "2026-06-22-workout-day-a.md",
       "lines": [
         {
           "raw": "Bench press | 3x5-8 | 165#",
@@ -40,10 +40,10 @@
       ]
     },
     {
-      "workout_id": "2026-06-18-day-b",
-      "workout_date": "2026-06-18",
+      "workout_id": "2026-06-24-day-b",
+      "workout_date": "2026-06-24",
       "slug": "day-b",
-      "source_file": "2026-06-18-workout-day-b.md",
+      "source_file": "2026-06-24-workout-day-b.md",
       "lines": [
         {
           "raw": "DB Romanian deadlift | 3x8-10 | 40#",
@@ -78,10 +78,10 @@
       ]
     },
     {
-      "workout_id": "2026-06-19-day-c",
-      "workout_date": "2026-06-19",
+      "workout_id": "2026-06-26-day-c",
+      "workout_date": "2026-06-26",
       "slug": "day-c",
-      "source_file": "2026-06-19-workout-day-c.md",
+      "source_file": "2026-06-26-workout-day-c.md",
       "lines": [
         {
           "raw": "Flat DB bench press | 3x8-12 | 40#",
