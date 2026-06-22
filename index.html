@@ -51,7 +51,7 @@
     min-height: var(--tap); padding: 10px 4px;
     border-bottom: 1px solid var(--line);
   }
-  .row.skipped { background: var(--skip); }
+  .row.done { background: #f0f7ff; }
   .cb {
     flex: 0 0 auto; width: 30px; height: 30px;
     appearance: none; -webkit-appearance: none;
@@ -67,7 +67,6 @@
   .ex { flex: 1 1 auto; min-width: 0; }
   .ex .nm { font-weight: 500; }
   .ex .meta { color: var(--muted); font-size: 14px; margin-top: 2px; }
-  .row.skipped .nm, .row.skipped .meta { text-decoration: line-through; opacity: 0.6; }
   .wt {
     flex: 0 0 auto; min-width: 78px; text-align: right;
     font-variant-numeric: tabular-nums;
@@ -88,6 +87,22 @@
     font: inherit; padding: 10px 12px;
     border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--fg);
   }
+
+  /* Walk/Run logger */
+  .wr-card { border-style: dashed; }
+  .wr-grid { display: flex; flex-direction: column; gap: 14px; margin: 8px 0; }
+  .wr-grid label { display: block; font-size: 14px; color: var(--muted); }
+  .wr-grid input {
+    display: block; width: 100%; min-height: 48px; margin-top: 6px;
+    font-size: 17px; padding: 8px 12px;
+    border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--fg);
+  }
+  .wr-summary {
+    margin: 6px 0 4px; padding: 12px 14px;
+    background: #f0f7ff; border-radius: 10px;
+    font-size: 14px; line-height: 1.5; color: var(--fg);
+  }
+  .wr-summary.empty { color: var(--muted); background: var(--skip); }
 
   /* Sticky action bar */
   .bar {
@@ -201,6 +216,25 @@
       <textarea id="note" placeholder="e.g. left knee tight, dropped to 3x6"></textarea>
     </div>
   </section>
+
+  <!-- WALK / RUN VIEW -->
+  <section id="walkrun" class="hidden">
+    <button class="back" id="wr-back">&larr; Change day</button>
+    <h1>Walk / Run</h1>
+    <p class="sub">Interval session — first interval walk, then alternating.</p>
+    <div class="wr-grid">
+      <label>Walk pace<input id="wr-walk-pace" type="text" autocapitalize="off" autocomplete="off" placeholder="e.g. 18:00 /mi or 3.2 mph"></label>
+      <label>Walk distance per interval<input id="wr-walk-dist" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 0.10 (mi)"></label>
+      <label>Run pace<input id="wr-run-pace" type="text" autocapitalize="off" autocomplete="off" placeholder="e.g. 9:30 /mi or 6.0 mph"></label>
+      <label>Run distance per interval<input id="wr-run-dist" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 0.15 (mi)"></label>
+      <label>Number of intervals (total)<input id="wr-intervals" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 10"></label>
+    </div>
+    <div class="wr-summary empty" id="wr-summary">Enter distances + interval count to see totals.</div>
+    <div class="note-wrap">
+      <label for="wr-addl">Additional exercises</label>
+      <textarea id="wr-addl" placeholder="e.g. push-ups 3x20, stretching"></textarea>
+    </div>
+  </section>
 </div>
 
 <!-- STICKY BAR (only in workout view) -->
@@ -236,6 +270,7 @@ const SHORTCUT_NAME = "SaveWorkout";
 
 let DATA = null;
 let current = null; // the selected workout object
+let mode = "workout"; // "workout" | "walkrun" — which view the action bar submits
 let GUIDES = {};    // normalized-name -> guide card (from exercise-guides.json)
 
 const $ = (id) => document.getElementById(id);
@@ -307,6 +342,14 @@ function renderPicker() {
     b.addEventListener("click", () => openWorkout(i));
     days.appendChild(b);
   });
+  // Always-available cardio logger, below the scheduled strength days.
+  const wr = document.createElement("button");
+  wr.className = "day-btn wr-card";
+  wr.innerHTML =
+    `<span class="d-id">Walk / Run</span>` +
+    `<span class="d-meta">Log an interval cardio session</span>`;
+  wr.addEventListener("click", openWalkRun);
+  days.appendChild(wr);
   // If exactly one matches today, open it straight away.
   const todays = list.filter((w) => w.workout_date === today);
   if (todays.length === 1) openWorkout(list.indexOf(todays[0]));
@@ -317,8 +360,9 @@ function openWorkout(idx) {
   $("picker").classList.add("hidden");
   $("workout").classList.remove("hidden");
   $("bar").classList.remove("hidden");
+  mode = "workout";
   $("w-title").textContent = current.workout_id;
-  $("w-sub").textContent = current.lines.length + " exercises · all checked — uncheck what you skip";
+  $("w-sub").textContent = current.lines.length + " exercises · check off what you complete";
   $("note").value = "";
 
   const rows = $("rows");
@@ -331,9 +375,9 @@ function openWorkout(idx) {
     const cb = document.createElement("input");
     cb.type = "checkbox";
     cb.className = "cb";
-    cb.checked = true;
+    cb.checked = false;
     cb.addEventListener("change", () => {
-      row.classList.toggle("skipped", !cb.checked);
+      row.classList.toggle("done", cb.checked);
     });
 
     const ex = document.createElement("div");
@@ -380,9 +424,96 @@ function openWorkout(idx) {
 
 function backToPicker() {
   $("workout").classList.add("hidden");
+  $("walkrun").classList.add("hidden");
   $("bar").classList.add("hidden");
   $("picker").classList.remove("hidden");
   current = null;
+  mode = "workout";
+}
+
+// ---- WALK / RUN -------------------------------------------------------------
+
+const r2 = (x) => Math.round(x * 100) / 100;
+
+function openWalkRun() {
+  mode = "walkrun";
+  $("picker").classList.add("hidden");
+  $("walkrun").classList.remove("hidden");
+  $("bar").classList.remove("hidden");
+  ["wr-walk-pace", "wr-walk-dist", "wr-run-pace", "wr-run-dist", "wr-intervals", "wr-addl"]
+    .forEach((id) => { $(id).value = ""; });
+  updateWRSummary();
+}
+
+// Walk-first alternating: interval 1 walk, 2 run, 3 walk, ...
+// => walks = ceil(N/2), runs = floor(N/2).
+function walkRunCounts(N) {
+  return { walk: Math.ceil(N / 2), run: Math.floor(N / 2) };
+}
+
+function updateWRSummary() {
+  const el = $("wr-summary");
+  const N = parseInt($("wr-intervals").value, 10);
+  const wd = parseFloat($("wr-walk-dist").value);
+  const rd = parseFloat($("wr-run-dist").value);
+  if (!Number.isFinite(N) || N <= 0) {
+    el.className = "wr-summary empty";
+    el.textContent = "Enter distances + interval count to see totals.";
+    return;
+  }
+  const c = walkRunCounts(N);
+  const parts = [`${N} intervals → ${c.walk} walk + ${c.run} run`];
+  if (Number.isFinite(wd) || Number.isFinite(rd)) {
+    const tw = Number.isFinite(wd) ? r2(c.walk * wd) : null;
+    const tr = Number.isFinite(rd) ? r2(c.run * rd) : null;
+    const dparts = [];
+    if (tw !== null) dparts.push(`${tw} mi walk`);
+    if (tr !== null) dparts.push(`${tr} mi run`);
+    let line = dparts.join(" + ");
+    if (tw !== null && tr !== null) line += ` = ${r2(tw + tr)} mi total`;
+    if (line) parts.push(line);
+  }
+  el.className = "wr-summary";
+  el.innerHTML = parts.map(escapeHtml).join("<br>");
+}
+
+function buildWalkRunPayload() {
+  const v = (id) => $(id).value.trim();
+  const wp = v("wr-walk-pace"), wd = v("wr-walk-dist");
+  const rp = v("wr-run-pace"), rd = v("wr-run-dist");
+  const n = v("wr-intervals"), addl = v("wr-addl");
+  const N = parseInt(n, 10);
+  const c = Number.isFinite(N) ? walkRunCounts(N) : { walk: "", run: "" };
+  const wdNum = parseFloat(wd), rdNum = parseFloat(rd);
+  const totalWalk = (Number.isFinite(N) && Number.isFinite(wdNum)) ? r2(c.walk * wdNum) : "";
+  const totalRun = (Number.isFinite(N) && Number.isFinite(rdNum)) ? r2(c.run * rdNum) : "";
+  const totalDist = (totalWalk !== "" && totalRun !== "") ? r2(totalWalk + totalRun) : "";
+
+  const fm =
+    "---\n" +
+    "type: walkrun\n" +
+    `logged_at: ${completedAtLocal()}\n` +
+    "pattern: walk-first-alternating\n" +
+    "---\n";
+
+  const lines = [
+    `walk_pace: ${wp}`,
+    `walk_distance_per_interval: ${wd}`,
+    `run_pace: ${rp}`,
+    `run_distance_per_interval: ${rd}`,
+    `intervals_total: ${n}`,
+    `walk_intervals: ${c.walk}`,
+    `run_intervals: ${c.run}`,
+    `total_walk_distance: ${totalWalk}`,
+    `total_run_distance: ${totalRun}`,
+    `total_distance: ${totalDist}`,
+    `additional_exercises: ${addl || "none"}`,
+  ];
+  return fm + lines.join("\n") + "\n";
+}
+
+function walkrunFilename() {
+  return `${stampLocal()}-walkrun-result.md`;
 }
 
 // Assemble the payload EXACTLY per result-payload-template.md
@@ -426,10 +557,8 @@ function filename() {
   return `${stampLocal()}-workout-result-${current.slug}.md`;
 }
 
-function submit() {
-  const payload = buildPayload();
-  const fname = filename();
-  // Line 1 = filename, lines 2..end = payload body. The shortcut splits on New Lines.
+// Fire the SaveWorkout shortcut: line 1 = filename, lines 2..end = body.
+function fireShortcut(fname, payload) {
   const input = fname + "\n" + payload;
   const url = "shortcuts://x-callback-url/run-shortcut" +
               "?name=" + encodeURIComponent(SHORTCUT_NAME) +
@@ -439,8 +568,16 @@ function submit() {
   window.location.href = url;
 }
 
+function submit() {
+  if (mode === "walkrun") {
+    fireShortcut(walkrunFilename(), buildWalkRunPayload());
+    return;
+  }
+  fireShortcut(filename(), buildPayload());
+}
+
 async function copyPayload() {
-  const payload = buildPayload();
+  const payload = mode === "walkrun" ? buildWalkRunPayload() : buildPayload();
   try {
     await navigator.clipboard.writeText(payload);
     toast("Payload copied. Paste into Drafts → Team Inbox if offline.");
@@ -536,6 +673,10 @@ $("refresh").addEventListener("click", () => {
 $("back").addEventListener("click", backToPicker);
 $("submit").addEventListener("click", submit);
 $("copy").addEventListener("click", copyPayload);
+
+$("wr-back").addEventListener("click", backToPicker);
+["wr-walk-dist", "wr-run-dist", "wr-intervals"].forEach((id) =>
+  $(id).addEventListener("input", updateWRSummary));
 
 load();
 </script>
