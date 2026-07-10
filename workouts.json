@@ -1,50 +1,6 @@
 {
-  "generated_at": "2026-07-01T15:10:26.251Z",
+  "generated_at": "2026-07-10T18:05:22.999Z",
   "workouts": [
-    {
-      "workout_id": "2026-06-29-day-c",
-      "workout_date": "2026-06-29",
-      "slug": "day-c",
-      "source_file": "2026-06-29-workout-day-c.md",
-      "lines": [
-        {
-          "raw": "Flat DB bench press | 3x8-12 | 40#",
-          "name": "Flat DB bench press",
-          "setsreps": "3x8-12",
-          "weight": "40#"
-        },
-        {
-          "raw": "One-arm DB row (per side) | 3x10-12 | 40#",
-          "name": "One-arm DB row (per side)",
-          "setsreps": "3x10-12",
-          "weight": "40#"
-        },
-        {
-          "raw": "DB lateral raise | 3x12-15 | 10#",
-          "name": "DB lateral raise",
-          "setsreps": "3x12-15",
-          "weight": "10#"
-        },
-        {
-          "raw": "Standing DB curl | 3x10-12 | 25#",
-          "name": "Standing DB curl",
-          "setsreps": "3x10-12",
-          "weight": "25#"
-        },
-        {
-          "raw": "Rope triceps pushdown | 3x10-12 | 30#",
-          "name": "Rope triceps pushdown",
-          "setsreps": "3x10-12",
-          "weight": "30#"
-        },
-        {
-          "raw": "Push-up AMRAP to form-failure | 2x15-25 | bodyweight",
-          "name": "Push-up AMRAP to form-failure",
-          "setsreps": "2x15-25",
-          "weight": "bodyweight"
-        }
-      ]
-    },
     {
       "workout_id": "2026-07-01-day-a",
       "workout_date": "2026-07-01",

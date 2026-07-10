@@ -29,6 +29,7 @@
     },
     "seated cable row": {
       "name": "Seated cable row",
+      "aliases": ["dual-cable + bench row"],
       "primary": ["upper-back", "trapezius"],
       "secondary": ["biceps", "deltoids", "forearm"],
       "video": { "youtube": "qD1WZ5pSuvk" },

@@ -276,7 +276,27 @@ let GUIDES = {};    // normalized-name -> guide card (from exercise-guides.json)
 const $ = (id) => document.getElementById(id);
 
 // Look up an exercise guide by its name (case/space-insensitive).
-const normName = (s) => String(s).toLowerCase().trim();
+const normName = (s) => String(s).toLowerCase().trim().replace(/\s+/g, " ");
+
+// Resolve a checklist line's exercise name to a guide card.
+// Ben ruling 2026-07-10: every workout line shows its video every time, even for
+// exercises done before — so matching must survive name variants ("Standing DB curl",
+// "Farmer carry walk", "One-arm DB row (per side)"). Order: exact match → match with
+// parenthetical qualifiers stripped → longest card key/alias contained in the name
+// as a whole-word phrase.
+function findGuide(name) {
+  const n = normName(name);
+  if (GUIDES[n]) return GUIDES[n];
+  const stripped = normName(n.replace(/\([^)]*\)/g, " "));
+  if (GUIDES[stripped]) return GUIDES[stripped];
+  let best = null, bestLen = 0;
+  for (const k in GUIDES) {
+    if (k.length > bestLen && (" " + stripped + " ").includes(" " + k + " ")) {
+      best = GUIDES[k]; bestLen = k.length;
+    }
+  }
+  return best;
+}
 
 function todayLocalISODate() {
   const d = new Date();
@@ -316,7 +336,10 @@ async function load() {
     if (gres.ok) {
       const raw = (await gres.json()).guides || {};
       GUIDES = {};
-      for (const k in raw) GUIDES[normName(k)] = raw[k];
+      for (const k in raw) {
+        GUIDES[normName(k)] = raw[k];
+        for (const a of raw[k].aliases || []) GUIDES[normName(a)] = raw[k];
+      }
     }
   } catch (e) { /* guides unavailable — non-fatal */ }
   renderPicker();
@@ -386,7 +409,7 @@ function openWorkout(idx) {
                    `<div class="meta">${escapeHtml(ln.setsreps)}</div>`;
 
     // If this exercise has a guide card, add a tappable "how-to" link under it.
-    const guide = GUIDES[normName(ln.name)];
+    const guide = findGuide(ln.name);
     if (guide) {
       const link = document.createElement("button");
       link.className = "howto";
