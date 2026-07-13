@@ -360,7 +360,7 @@ function renderPicker() {
     b.className = "day-btn" + (w.workout_date === today ? " today" : "");
     const isToday = w.workout_date === today;
     b.innerHTML =
-      `<span class="d-id">${escapeHtml(w.workout_id)}${isToday ? '<span class="badge">TODAY</span>' : ''}</span>` +
+      `<span class="d-id">${escapeHtml(w.title || w.workout_id)}${isToday ? '<span class="badge">TODAY</span>' : ''}</span>` +
       `<span class="d-meta">${w.lines.length} exercises &middot; ${escapeHtml(w.workout_date)}</span>`;
     b.addEventListener("click", () => openWorkout(i));
     days.appendChild(b);
@@ -384,7 +384,7 @@ function openWorkout(idx) {
   $("workout").classList.remove("hidden");
   $("bar").classList.remove("hidden");
   mode = "workout";
-  $("w-title").textContent = current.workout_id;
+  $("w-title").textContent = current.title || current.workout_id;
   $("w-sub").textContent = current.lines.length + " exercises · check off what you complete";
   $("note").value = "";
 
