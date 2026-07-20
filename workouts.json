@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-13T16:13:23.307Z",
+  "generated_at": "2026-07-20T18:05:22.958Z",
   "workouts": [
     {
-      "workout_id": "2026-07-13-day-a",
-      "workout_date": "2026-07-13",
+      "workout_id": "2026-07-20-day-a",
+      "workout_date": "2026-07-20",
       "title": "Monday — Day A (horizontal push/pull + legs)",
       "slug": "day-a",
-      "source_file": "2026-07-13-workout-day-a.md",
+      "source_file": "2026-07-20-workout-day-a.md",
       "lines": [
         {
           "raw": "Barbell bench press | 3x5-8 | 165#",
@@ -41,11 +41,11 @@
       ]
     },
     {
-      "workout_id": "2026-07-15-day-b",
-      "workout_date": "2026-07-15",
+      "workout_id": "2026-07-22-day-b",
+      "workout_date": "2026-07-22",
       "title": "Wednesday — Day B (hinge + vertical pull)",
       "slug": "day-b",
-      "source_file": "2026-07-15-workout-day-b.md",
+      "source_file": "2026-07-22-workout-day-b.md",
       "lines": [
         {
           "raw": "DB Romanian deadlift | 3x8-10 | 40#",
@@ -80,11 +80,11 @@
       ]
     },
     {
-      "workout_id": "2026-07-17-day-c",
-      "workout_date": "2026-07-17",
+      "workout_id": "2026-07-24-day-c",
+      "workout_date": "2026-07-24",
       "title": "Friday — Day C (upper-body volume)",
       "slug": "day-c",
-      "source_file": "2026-07-17-workout-day-c.md",
+      "source_file": "2026-07-24-workout-day-c.md",
       "lines": [
         {
           "raw": "Flat DB bench press | 3x8-12 | 40#",
